@@ -50,7 +50,7 @@ if len(sys.argv) < 2:
 prompt = sys.argv[1]
 print(f"Generating images based on prompt: {prompt}")
 
-accessToken = getAccessToken(CLIENT_ID, CLIENT_SECRET)['access_token'];
+accessToken = getAccessToken(CLIENT_ID, CLIENT_SECRET)['access_token']
 
 # So you CAN pass an array of styles, but I don't know how it's supposed to work
 # when passing different styles, so we're going to do one at  atime

@@ -1,5 +1,3 @@
-# This script demos using reference images
-
 import os 
 import requests 
 import json
@@ -13,6 +11,7 @@ def getAccessToken(id, secret):
 	response = requests.post(f"https://ims-na1.adobelogin.com/ims/token/v3?client_id={id}&client_secret={secret}&grant_type=client_credentials&scope=openid,AdobeID,firefly_enterprise,firefly_api")
 	return response.json()
 
+
 def uploadImage(path, id, token):
 	
 	with open(path,'rb') as file:
@@ -24,48 +23,43 @@ def uploadImage(path, id, token):
 		}) 
 		return response.json()
 
-def textToImage(text, imageId, id, token):
+
+def generativeExpand(image, num, size, prompt, id, token):
+
+	width, height = size.split("x")
 
 	data = {
 		"n":3,
-		"prompt":text,
+		"prompt":prompt,
 		"contentClass":"photo",
 		"size":{
-			"width":2048,
-			"height":2048
+			"width":width,
+			"height":height
 		},
-		"styles":{
-			"referenceImage":{
+		"image":{
 				"id":imageId
-			}
 		}
 	}
 
-	response = requests.post("https://firefly-beta.adobe.io/v2/images/generate", json=data, headers = {
+	response = requests.post("https://firefly-beta.adobe.io/v1/images/expand", json=data, headers = {
 		"X-API-Key":id, 
 		"Authorization":f"Bearer {token}",
 		"Content-Type":"application/json"
 	}) 
-
+	
 	return response.json()
 
-
 accessToken = getAccessToken(CLIENT_ID, CLIENT_SECRET)['access_token']
-#print(accessToken)
 
 image = uploadImage("input/cat_godzilla.jpg", CLIENT_ID, accessToken)
 imageId = image["images"][0]["id"]
 
-prompt = "cats on unicorns under a rainbow"
+response = generativeExpand(imageId, 1, "1792x1024", "", CLIENT_ID, accessToken)
+#print(json.dumps(response, indent=2))
 
-response = textToImage(prompt, imageId , CLIENT_ID, accessToken)
-#print(json.dumps(response,indent=1))
-
-# So, assume a good response, and loop over response.outputs
-
-for resp in response["outputs"]:
+for resp in response["images"]:
 	# todo, make new file based on slug of prompt + seed
-	newName = "output/" + slugify(prompt) + "-" + str(resp["seed"]) + ".jpg"
+	newName = "output/" + "expandexample" + "-" + str(resp["seed"]) + ".jpg"
 	imgUrl = resp["image"]["presignedUrl"]
 	print(f"Saving {newName}")
 	with open(newName,'wb') as output:

@@ -56,7 +56,7 @@ else:
 
 print(f"Generating {num} image(s) based on prompt: {prompt}")
 
-accessToken = getAccessToken(CLIENT_ID, CLIENT_SECRET)['access_token'];
+accessToken = getAccessToken(CLIENT_ID, CLIENT_SECRET)['access_token']
 
 if styles:
 

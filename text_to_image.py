@@ -31,7 +31,7 @@ def textToImage(text, id, token):
 	return response.json()
 
 
-accessToken = getAccessToken(CLIENT_ID, CLIENT_SECRET)['access_token'];
+accessToken = getAccessToken(CLIENT_ID, CLIENT_SECRET)['access_token']
 #print(accessToken)
 
 prompt = "cats on unicorns under a rainbow"
