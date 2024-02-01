@@ -54,7 +54,7 @@ accessToken = getAccessToken(CLIENT_ID, CLIENT_SECRET)['access_token']
 image = uploadImage("input/cat_godzilla.jpg", CLIENT_ID, accessToken)
 imageId = image["images"][0]["id"]
 
-response = generativeExpand(imageId, 1, "1792x1024", "", CLIENT_ID, accessToken)
+response = generativeExpand(imageId, 1, "1792x1024", "dogs flying in airplanes", CLIENT_ID, accessToken)
 #print(json.dumps(response, indent=2))
 
 for resp in response["images"]:
