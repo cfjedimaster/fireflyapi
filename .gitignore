@@ -2,3 +2,4 @@
 .vscode
 output/*.jpg
 set_python_env
+demos/**/temp
