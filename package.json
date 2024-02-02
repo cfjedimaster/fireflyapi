@@ -1,0 +1,17 @@
+{
+  "name": "firefly-api",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sindresorhus/slugify": "^2.2.1",
+    "dotenv": "^16.4.1"
+  }
+}
