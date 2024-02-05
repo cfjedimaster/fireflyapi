@@ -27,7 +27,7 @@ f.close()
 prompts = ["on a beach, sunset, happy vibes", "on a mountain trail"]
 
 # The output sizes
-sizes = [ "1792x1024", "1024x1408", "14408x1024", "1024x1024"]
+sizes = [ "1792x1024", "1024x1408", "1408x1024", "1024x1024"]
 
 def dropbox_connect(app_key, app_secret, refresh_token):
 	try:
@@ -169,8 +169,8 @@ def generativeFill(text, imageId, maskId, size, id, token):
 		"n":1,
 		"prompt":text,
 		"size":{
-			"width":1792,
-			"height":1024
+			"width":width,
+			"height":height
 		},
 		"image":{
 			"id":imageId
