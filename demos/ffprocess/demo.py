@@ -161,17 +161,12 @@ def uploadImage(path, id, token):
 		}) 
 		return response.json()
 
-def generativeFill(text, imageId, maskId, size, id, token):
-
-	width, height = size.split('x')
+# Define a method to call Firefly Generative Fill, Generative Expand and call them
+def generativeFill(text, imageId, maskId, id, token):
 
 	data = {
 		"n":1,
 		"prompt":text,
-		"size":{
-			"width":width,
-			"height":height
-		},
 		"image":{
 			"id":imageId
 		},
@@ -181,6 +176,29 @@ def generativeFill(text, imageId, maskId, size, id, token):
 	}
 
 	response = requests.post("https://firefly-beta.adobe.io/v1/images/fill", json=data, headers = {
+		"X-API-Key":id, 
+		"Authorization":f"Bearer {token}",
+		"Content-Type":"application/json"
+	}) 
+
+	return response.json()
+
+def generativeExpand(imageId, size, id, token):
+
+	width, height = size.split('x')
+
+	data = {
+		"n":1,
+		"image":{
+			"id":imageId
+		},
+		"size":{
+			"width":width, 
+			"height":height
+		}
+	}
+
+	response = requests.post("https://firefly-beta.adobe.io/v1/images/expand", json=data, headers = {
 		"X-API-Key":id, 
 		"Authorization":f"Bearer {token}",
 		"Content-Type":"application/json"
@@ -260,12 +278,14 @@ for file in files:
 	
 			print(f"Generating for prompt \"{prompt}\" and size \"{size}\"")
 
-			fillResult = generativeFill(prompt, origFileId, maskFileId, size, ff_client_id, ff_access_token)
+			fillResult = generativeFill(prompt, origFileId, maskFileId, ff_client_id, ff_access_token)
+			expandResult = generativeExpand(fillResult["images"][0]["image"]["id"], size, ff_client_id, ff_access_token)
+			imgUrl = expandResult["images"][0]["image"]["presignedUrl"]
+
 			print("Generated image is created.")
-			#print(json.dumps(fillResult,indent=2))
 
 			toSendToDropbox = []
-			for resp in fillResult["images"]:
+			for resp in expandResult["images"]:
 				# todo, make new file based on slug of prompt + seed
 				newName = "temp/" + slugify(prompt) + "-" + slugify(size) + "-" + str(resp["seed"]) + ".jpg"
 				imgUrl = resp["image"]["presignedUrl"]
