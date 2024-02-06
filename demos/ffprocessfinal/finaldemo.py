@@ -98,14 +98,9 @@ for size in sizes:
 	fillResult = generativeFill(prompt, origFileId, maskFileId, ff_client_id, ff_access_token)
 	expandResult = generativeExpand(fillResult["images"][0]["image"]["id"], size, ff_client_id, ff_access_token)
 
-	newName = "temp/"+size+".jpg"
 	imgUrl = expandResult["images"][0]["image"]["presignedUrl"]
 	sizeUrls.append(imgUrl)
-
-	print(f"Saving {newName}")
-	with open(newName,'wb') as output:
-		bits = requests.get(imgUrl, stream=True).content
-		output.write(bits)
+	print(json.dumps(expandResult, indent=2))
 
 # Use Photoshop APIs to create a new artboard PSD
 db_refresh_token = os.environ.get('DROPBOX_REFRESH_TOKEN')
