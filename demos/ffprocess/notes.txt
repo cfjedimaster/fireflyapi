@@ -4,98 +4,21 @@ ref: https://practicaldatascience.co.uk/data-science/how-to-use-the-dropbox-api-
 ref: https://stackoverflow.com/questions/70641660/how-do-you-get-and-use-a-refresh-token-for-the-dropbox-api-python-3-x
 
 
-{
-  "inputs": [
-    {
-      "href": "/-original.jpg?",
-      "storage": "azure"
-    }
-  ],
-  "options": {
-    "actionJSON": [
-      {
-        "_obj": "set",
-        "_target": [
-          {
-            "_property": "background",
-            "_ref": "layer"
-          }
-        ],
-        "layerID": 2,
-        "to": {
-          "_obj": "layer",
-          "mode": {
-            "_enum": "blendMode",
-            "_value": "normal"
-          },
-          "opacity": {
-            "_unit": "percentUnit",
-            "_value": 100
-          }
-        }
-      },
-      {
-        "_obj": "removeBackground"
-      },
-      {
-        "_obj": "select",
-        "_target": [
-          {
-            "_enum": "ordinal",
-            "_ref": "channel",
-            "_value": "targetEnum"
-          }
-        ],
-        "makeVisible": true
-      },
-      {
-        "_obj": "set",
-        "_target": [
-          {
-            "_property": "selection",
-            "_ref": "channel"
-          }
-        ],
-        "to": {
-          "_enum": "ordinal",
-          "_value": "allEnum"
-        }
-      },
-      {
-        "_obj": "copyEvent",
-        "copyHint": "pixels"
-      },
-      {
-        "_obj": "make",
-        "_target": [
-          {
-            "_ref": "layer"
-          }
-        ],
-        "layerID": 3
-      },
-      {
-        "_obj": "paste",
-        "antiAlias": {
-          "_enum": "antiAliasType",
-          "_value": "antiAliasNone"
-        },
-        "as": {
-          "_class": "pixel"
-        }
-      },
-      {
-        "_obj": "invert"
-      }
-    ]
-  },
-  "outputs": [
-    {
-      "href": "/-mask.jpg?",
-      "overwrite": true,
-      "storage": "azure",
-      "type": "image/jpeg"
-    }
-  ]
-}
+Outline:
+
+Connect to Dropbox and get a list of files from the input folder
+For each file:
+
+	Create a masked version of the file and save it to a temp place in Dropbox
+	Use ActionJSON to invert the mask, saving to Dropbox
+
+	Download original file
+	Download inverted mask
+
+	Upload both to Firefly API
+	For a list of prompts:
+		For a list of sizes:
+			Create a genfilled version
+			Create a resized one using Gen Expand
+			Save to Dropbox output folder
 
