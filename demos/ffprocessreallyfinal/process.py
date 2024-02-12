@@ -265,6 +265,7 @@ def createPSD(psd, koProduct, sizes, sizeUrls, outputs, text, id, token):
 	response = requests.post(f"https://image.adobe.io/pie/psdService/documentOperations", headers = {"Authorization": f"Bearer {token}", "x-api-key": id }, json=data)
 	return response.json()
 
+theTime = time.time()
 for prompt in prompts:
 	
 	# Step Five - For each prompt, generate a new background using prompt and reference
@@ -283,7 +284,8 @@ for prompt in prompts:
 		expandedBackground = generativeExpand(newImage, size, ff_client_id, ff_access_token)
 		sizeImages[size] = expandedBackground
 		# Save a copy as well
-		newName = f"backgroundtemp/{slugify(prompt)}-{size}.jpg"
+
+		newName = f"backgroundtemp/{slugify(prompt)}-{size} - {theTime}.jpg"
 		with open(newName,'wb') as output:
 			bits = requests.get(expandedBackground, stream=True).content
 			output.write(bits)
