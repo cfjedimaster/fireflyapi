@@ -1,0 +1,23 @@
+
+styleReferenceImage = Upload style reference image
+
+for each prod image (prodimg)
+  koprodimage = knockout(prodimg)
+
+for each p in prompts (from a file)
+  
+  newbackground = text to image (p, styleReferenceImage)
+
+  for each dimension(d)
+     genexpandedbackground = genExpand (newbackground, d)
+
+  for each language (translation file)
+     [lang code, call to actoion = split (line,'csv')
+     for each product (koimage)
+
+        call documentOperations (
+            koprodimage, cta, genexpandbg 1,
+            koprodimage, cta, genexpandbg 2
+            koprodimage, cta, genexpandbg 3
+            koprodimage, cta, genexpandbg 4            
+        )
