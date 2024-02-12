@@ -282,6 +282,12 @@ for prompt in prompts:
 		print(f"Generating an expanded one at size {size}")
 		expandedBackground = generativeExpand(newImage, size, ff_client_id, ff_access_token)
 		sizeImages[size] = expandedBackground
+		# Save a copy as well
+		newName = f"backgroundtemp/{slugify(prompt)}-{size}.jpg"
+		with open(newName,'wb') as output:
+			bits = requests.get(expandedBackground, stream=True).content
+			output.write(bits)
+
 
 	for lang in languages:
 		

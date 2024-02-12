@@ -13,7 +13,7 @@ for each p in prompts (from a file)
      genexpandedbackground = genExpand (newbackground, d)
 
   for each language (translation file)
-     [lang code, call to actoion = split (line,'csv')
+     [lang code, call to action = split (line,'csv')
      for each product (koimage)
 
         call documentOperations (
@@ -22,3 +22,7 @@ for each p in prompts (from a file)
             koprodimage, cta, genexpandbg 3
             koprodimage, cta, genexpandbg 4            
         )
+
+after FF is done, save the interim step from s3 to db, use in PS API 
+no, take the FF s3 result and dl
+
