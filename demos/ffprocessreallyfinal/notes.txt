@@ -1,8 +1,9 @@
+Ray: ensure you pip install python-slugify
 
 styleReferenceImage = Upload style reference image
 
 for each prod image (prodimg)
-  koprodimage = knockout(prodimg)
+  koprodimage = knockout(prodimg) (remove bg)
 
 for each p in prompts (from a file)
   
