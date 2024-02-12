@@ -285,7 +285,7 @@ for prompt in prompts:
 		sizeImages[size] = expandedBackground
 		# Save a copy as well
 
-		newName = f"backgroundtemp/{slugify(prompt)}-{size} - {theTime}.jpg"
+		newName = f"backgroundtemp/{slugify(prompt)}-{size}-{theTime}.jpg"
 		with open(newName,'wb') as output:
 			bits = requests.get(expandedBackground, stream=True).content
 			output.write(bits)
