@@ -4,3 +4,5 @@ output/*.jpg
 set_python_env
 demos/**/temp
 demos/ffprocessreallyfinal/backgroundtemp/*.jpg
+env
+.DS_Store

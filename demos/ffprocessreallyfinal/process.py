@@ -301,7 +301,7 @@ for prompt in prompts:
 
 			for size in sizes:
 				width, height = size.split('x')
-				outputUrls.append(dropbox_get_upload_link(f"/FFDemo2/output/{lang['language']}-{slugify(prompt)}-{width}x{height}.jpg"))
+				outputUrls.append(dropbox_get_upload_link(f"/FFDemo2/output/{lang['language']}-{slugify(prompt)}-{width}x{height}-{theTime}.jpg"))
 
 			result = createPSD(psdOnDropbox, koProducts[product], sizes, sizeImages, outputUrls, lang["text"], ps_client_id, ps_access_token)
 			print("The Photoshop API job is being run...")
