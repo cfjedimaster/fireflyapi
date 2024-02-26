@@ -1,3 +1,6 @@
+/*
+This version demonstrates uploading a reference image as source for the prompt.
+*/
 import 'dotenv/config';
 import fs from 'fs';
 import slugify from '@sindresorhus/slugify';
@@ -28,23 +31,53 @@ async function getAccessToken(id, secret) {
 }
 
 /*
+Upload an image to be used as a reference.
+*/
+async function uploadImage(filePath, id, token) {
+
+	let stream = fs.createReadStream(filePath);
+	let stats = fs.statSync(filePath);
+	let fileSizeInBytes = stats.size;
+	// todo: make dynamic
+	let fileType = 'image/jpeg';
+
+	let upload = await fetch('https://firefly-beta.adobe.io/v2/storage/image', {
+		method:'POST', 
+		headers: {
+			'Authorization':`Bearer ${token}`, 
+			'X-API-Key':id, 
+			'Content-Type':fileType, 
+			'Content-Length':fileSizeInBytes
+		}, 
+		duplex:'half', 
+		body:stream
+	});
+
+	return (await upload.json()).images[0];
+}
+
+/*
 size valid options: Square (2048x2048), Landscape (2304x1792), Portrait (1792x2304), Widescreen (2688x1536)
 contentClass options: null, photo, art
 n max is 4
 */
-async function textToImage(text, id, token, size="1024x1024", n=1, contentClass, styles) {
+async function textToImage(text, id, token, sourceImage, size="1024x1024", n=1, contentClass) {
 
 	let [ width, height ] = size.split('x');
 	let body = {
 		"size": { width, height }, 
 		"n":n,
-		"prompt":text
+		"prompt":text,
+		"styles": {
+			"referenceImage":{
+				"id":sourceImage
+			}
+		}
 	}
 
 	if(contentClass) body.contentClass = contentClass;
-	// Check the docs on this one.
-	if(styles) body.styles = styles;
-console.log(body);
+
+	
 
 	let req = await fetch('https://firefly-beta.adobe.io/v2/images/generate', {
 		method:'POST',
@@ -69,20 +102,26 @@ async function downloadFile(url, filePath) {
 }
 
 
+
 const prompt = 'a humanized unicorn wearing a leather jacket and looking tough';
+const source = 'input/red_sunset_car.jpg';
 
 console.log('Getting access token...');
 let token = await getAccessToken(CLIENT_ID, CLIENT_SECRET);
 
+console.log('Uploading source image');
+let upload = await uploadImage(source, CLIENT_ID, token);
+
+
 console.log('Now generating my images...');
-let result = await textToImage(prompt, CLIENT_ID, token, '2304x1792', 3, 'photo', { presets: ['Black_and_white','Antique_photo'] }) ;
+let result = await textToImage(prompt, CLIENT_ID, token, upload.id, '2304x1792', 3, 'photo') ;
 if(!result.outputs) {
 	console.log(JSON.stringify(result,null,'\t'));
 	process.exit(1);
 }
-console.log(result);
+
 for(let output of result.outputs) {
-	let file = `${slugify(prompt)}_${output.seed}.jpg`;
+	let file = `output/${slugify(prompt)}_${output.seed}_source_${slugify(source)}.jpg`;
 	//await saveBase64(image.base64, file);
 	await downloadFile(output.image.presignedUrl, file);
 	console.log(`Saved ${file}.`);
