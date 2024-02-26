@@ -23,9 +23,8 @@ def getFFAccessToken(id, secret):
 
 
 ff_access_token = getFFAccessToken(ff_client_id, ff_client_secret)
-print("Got Firefly access token.", ff_access_token)
+print("Got Firefly access token.")
 
-# Define a method to upload assets and use it for our source image + mask
 def uploadImage(path, id, token):
 	
 	with open(path,'rb') as file:
@@ -95,12 +94,13 @@ prompt = "on a beach, sunset, happy vibes"
 print("Generating new images for our desired sizes.")
 sizeUrls = []
 for size in sizes:
+	
+	print(f"Generating for prompt \"{prompt}\" and size \"{size}\"")
 	fillResult = generativeFill(prompt, origFileId, maskFileId, ff_client_id, ff_access_token)
 	expandResult = generativeExpand(fillResult["images"][0]["image"]["id"], size, ff_client_id, ff_access_token)
 
 	imgUrl = expandResult["images"][0]["image"]["presignedUrl"]
 	sizeUrls.append(imgUrl)
-	print(json.dumps(expandResult, indent=2))
 
 # Use Photoshop APIs to create a new artboard PSD
 db_refresh_token = os.environ.get('DROPBOX_REFRESH_TOKEN')
@@ -193,6 +193,8 @@ psToken = getPhotoshopAccessToken(ps_client_id, ps_client_secret)
 for size in sizes:
 	width, height = size.split('x')
 	outputUrls.append(dropbox_get_upload_link(f"/FFDemo/Final/{width}x{height}.jpg"))
-	
 
-
+result = createPSD(psdOnDropbox, sizes, sizeUrls, outputUrls, ps_client_id, psToken)
+print("The Photoshop API job is being run...")
+finalResult=pollPSDJob(result, ps_client_id, psToken)
+print("Done")	

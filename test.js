@@ -1,6 +1,13 @@
+/*
+This is a Node.js demo of taking a hard coded prompt and generating 3 images from it.
+*/
+
 import 'dotenv/config';
-import fs from 'fs/promises';
+import fs from 'fs';
 import slugify from '@sindresorhus/slugify';
+
+import { Readable } from 'stream';
+import { finished } from 'stream/promises';
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -33,23 +40,23 @@ styles options: see docs, lots of options
 */
 async function textToImage(text, id, token, size="1024x1024", n=1, contentClass, styles=[]) {
 
+	let [ width, height ] = size.split('x');
 	let body = {
-		"size":size, 
-		"n":n,
-		"prompt":text, 
-		"styles":styles
+		"n":3,
+		"prompt":text,
+		"size":{
+			"width":width,
+			"height":height
+		}
 	}
 
 	if(contentClass) body.contentClass = contentClass;
 
-	let req = await fetch('https://firefly-beta.adobe.io/v1/images/generations', {
+	let req = await fetch('https://firefly-beta.adobe.io/v2/images/generate', {
 		method:'POST',
 		headers: {
 			'X-Api-Key':id, 
 			'Authorization':`Bearer ${token}`,
-			'Accept':'application/json+base64', 
-			'x-accept-mimetype':'image/jpeg',
-			'x-api-variant':'v2',
 			'Content-Type':'application/json'
 		}, 
 		body: JSON.stringify(body)
@@ -59,9 +66,11 @@ async function textToImage(text, id, token, size="1024x1024", n=1, contentClass,
 	return resp;
 }
 
-// Saving b64 properly isn't hard, but I still though a utility func would be helpful
-async function saveBase64(b64, path) {
-	return await fs.writeFile(path, b64, 'base64');
+async function downloadFile(url, filePath) {
+	let res = await fetch(url);
+	const body = Readable.fromWeb(res.body);
+	const download_write_stream = fs.createWriteStream(filePath);
+	return await finished(body.pipe(download_write_stream));
 }
 
 const prompt = 'a humanized unicorn wearing a leather jacket and looking tough';
@@ -71,14 +80,14 @@ let token = await getAccessToken(CLIENT_ID, CLIENT_SECRET);
 
 console.log('Now generating my images...');
 let result = await textToImage(prompt, CLIENT_ID, token, '1408x1024', 3, 'art', ['Nostalgic','Antique photo']);
-if(!result.images) {
-	console.log(result);
+if(!result.outputs) {
+	console.log(JSON.stringify(result,null,'\t'));
 	process.exit(1);
 }
 
-for(let image of result.images) {
-	let file = `${slugify(prompt)}_${image.seed}.jpg`;
-	await saveBase64(image.base64, file);
+for(let output of result.outputs) {
+	let file = `output/${slugify(prompt)}_${output.seed}.jpg`;
+	await downloadFile(output.image.presignedUrl, file);
 	console.log(`Saved ${file}.`);
 }
 
