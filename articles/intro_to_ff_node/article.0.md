@@ -1,14 +1,13 @@
 # Getting Started with Firefly APIs and Node.js
 
-Adobe's Firefly APIs allow for incredibly powerful creative workflows with a simple-to-use REST-based API. In this tutorial, we'll walk you through the process of creating your first implementation of the APIs. Let's get started!
+Adobe's Firefly APIs allow for incredibly powerful creative workflows with a simple to use REST-based API. In this tutorial, we'll walk you through the process of creating your first Node.js implementation of the APIs. Let's get started!
 
 ## Prereqs
 
 In order to complete this tutorial, you will need:
 
-* Firefly API credentials. You can sign up for [free trial credentials](https://developer.adobe.com/firefly-api) and use them for this tutorial. You will need two values: `client_id` and `client_secret`. 
+* Firefly API credentials. You can sign up for [free trial credentials](https://developer.adobe.com/firefly-api) and use them fdor this tutorial. You will need two values: `client_id` and `client_secret`. 
 * You will want to set these two values are environment variables available in your terminal/shell. How that's done depends on your operating system, but for the Mac (and WSL), you can do:  `export CLIENT_ID=YOURIDHERE` and `export CLIENT_SECRET=YOURSECRETHERE`. Note that our code is going to assume `CLIENT_ID` and `CLIENT_SECRET` - case matters!
-* The code for this tutorial will be presented in both Node.js and Python, so one
 * Node.js installed and some familiarity with working with it, or JavaScript in general. 
 
 Begin by creating a new script, named `firefly.js`, and save it anywhere on your computer. This will be the script we use to test our integration with Firefly APIs. 
@@ -25,7 +24,7 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 ```
 
-To authenticate, we take these two variables and make a POST request to our authentication endpoint: `https://ims-na1.adobelogin.com/ims/token/v3`. We need to pass our credentials along with that requested scopes that allow for access to Firefly. We can wrap up the entire thing in one simple function:
+To authenticate, we take these two variables and make a POST request to our authentication endpoint: `https://ims-na1.adobelogin.com/ims/token/v3`. We need to pass our credentials along with requested scopes that allow for access to Firefly. We can wrap up the entire thing in one simple function:
 
 ```js
 async function getAccessToken(id, secret) {
@@ -140,7 +139,7 @@ import { Readable } from 'stream';
 import { finished } from 'stream/promises';
 ```
 
-Next, define a simple function that given a URL and filepath, will stream the data to the filesystem (this portion is only required in Node):
+Next, define a simple function that given a URL and filepath, will stream the data to the filesystem:
 
 ```js
 async function downloadFile(url, filePath) {
