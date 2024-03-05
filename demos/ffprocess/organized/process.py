@@ -39,7 +39,7 @@ def getPhotoshopAccessToken(id, secret):
 	response = requests.post(f"https://ims-na1.adobelogin.com/ims/token/v2?client_id={id}&client_secret={secret}&grant_type=client_credentials&scope=openid,AdobeID")
 	return response.json()["access_token"]
 
-def createKOJob(input, output, id, token):
+def createRemoveBackgroundJob(input, output, id, token):
 	
 	data = {
 		"input": {
@@ -61,27 +61,17 @@ def pollJob(job, id, token):
 
 		response = requests.get(jobUrl, headers = {"Authorization": f"Bearer {token}", "x-api-key": id })
 		json_response = response.json()
-		status = json_response["status"]
+		if "status" in json_response:
+			status = json_response["status"]
+		elif "status" in json_response["outputs"][0]:
+			status = json_response["outputs"][0]["status"]
+			
 		#print(json.dumps(json_response,indent=2))
 		#print(f"Current status: {status }")
 		if status != 'succeeded' and status != 'failed':
 			time.sleep(3)
 		else:
 			return json_response
-
-def pollPSDJob(job, id, token):
-	jobUrl = job["_links"]["self"]["href"]
-	status = "" 
-	while status != 'succeeded' and status != 'failed':
-
-		response = requests.get(jobUrl, headers = {"Authorization": f"Bearer {token}", "x-api-key": id })
-		json_response = response.json()
-		status = json_response["outputs"][0]["status"]
-		if status != 'succeeded' and status != 'failed':
-			time.sleep(3)
-		else:
-			return json_response
-
 
 def dropbox_connect(app_key, app_secret, refresh_token):
 	try:
@@ -238,8 +228,8 @@ print("Connected to Photoshop, Firefly, and Dropbox APIs.")
 referenceImage = uploadImage('input/source_image.jpg', ff_client_id, ff_access_token)
 print("Reference image uploaded.")
 
-
-koProducts = {}
+# We use this to remember where are product images w/ the backgrounds are stored.
+rbProducts = {}
 for product in products:
 	
 	# First, upload the source
@@ -251,11 +241,11 @@ for product in products:
 	# Make a link to upload the result 
 	writableLink = dropbox_get_upload_link(f"{db_base_folder}knockout/{product}")
 
-	koJob = createKOJob(readableLink, writableLink, ps_client_id, ps_access_token)
-	result = pollJob(koJob, ps_client_id, ps_access_token)
+	rbJob = createRemoveBackgroundJob(readableLink, writableLink, ps_client_id, ps_access_token)
+	result = pollJob(rbJob, ps_client_id, ps_access_token)
 
 	readableLink = dropbox_get_read_link(f"{db_base_folder}knockout/{product}")
-	koProducts[product] = readableLink
+	rbProducts[product] = readableLink
 	# For now, we assume ok
 
 
@@ -269,20 +259,14 @@ for prompt in prompts:
 	# I store a key from size to the image
 	sizeImages = {}
 
-	# I'm using later when generating final results.
-	psdOnDropbox = dropbox_get_read_link("/FFDemo2/genfill-banner-template-text-comp.psd")
+	# I'm using this later when generating final results.
+	psdOnDropbox = dropbox_get_read_link(f"{db_base_folder}genfill-banner-template-text-comp.psd")
 
 	for size in sizes:
-		# Step Siz - For each size, generate an expanded background
+		# Step Six - For each size, generate an expanded background
 		print(f"Generating an expanded one at size {size}")
 		expandedBackground = generativeExpand(newImage, size, ff_client_id, ff_access_token)
 		sizeImages[size] = expandedBackground
-		# Save a copy as well
-
-		newName = f"backgroundtemp/{slugify(prompt)}-{size}-{theTime}.jpg"
-		with open(newName,'wb') as output:
-			bits = requests.get(expandedBackground, stream=True).content
-			output.write(bits)
 
 
 	for lang in languages:
@@ -295,10 +279,10 @@ for prompt in prompts:
 
 			for size in sizes:
 				width, height = size.split('x')
-				outputUrls.append(dropbox_get_upload_link(f"/FFDemo2/output/{lang['language']}-{slugify(prompt)}-{width}x{height}-{theTime}.jpg"))
+				outputUrls.append(dropbox_get_upload_link(f"{db_base_folder}output/{lang['language']}-{slugify(prompt)}-{width}x{height}-{theTime}.jpg"))
 
-			result = createPSD(psdOnDropbox, koProducts[product], sizes, sizeImages, outputUrls, lang["text"], ps_client_id, ps_access_token)
+			result = createPSD(psdOnDropbox, rbProducts[product], sizes, sizeImages, outputUrls, lang["text"], ps_client_id, ps_access_token)
 			print("The Photoshop API job is being run...")
-			finalResult=pollPSDJob(result, ps_client_id, ps_access_token)
+			finalResult=pollJob(result, ps_client_id, ps_access_token)
 
 print("Done.")
