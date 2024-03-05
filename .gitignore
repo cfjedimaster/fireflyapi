@@ -7,4 +7,4 @@ demos/ffprocessreallyfinal/backgroundtemp/*.jpg
 env
 .DS_Store
 node_modules
-
+articles/**/code/*.jpg

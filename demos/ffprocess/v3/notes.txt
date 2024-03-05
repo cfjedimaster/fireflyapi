@@ -1,0 +1,28 @@
+Ray: ensure you pip install python-slugify
+
+styleReferenceImage = Upload style reference image
+
+for each prod image (prodimg)
+  koprodimage = knockout(prodimg) (remove bg)
+
+for each p in prompts (from a file)
+  
+  newbackground = text to image (p, styleReferenceImage)
+
+  for each dimension(d)
+     genexpandedbackground = genExpand (newbackground, d)
+
+  for each language (translation file)
+     [lang code, call to action = split (line,'csv')
+     for each product (koimage)
+
+        call documentOperations (
+            koprodimage, cta, genexpandbg 1,
+            koprodimage, cta, genexpandbg 2
+            koprodimage, cta, genexpandbg 3
+            koprodimage, cta, genexpandbg 4            
+        )
+
+after FF is done, save the interim step from s3 to db, use in PS API 
+no, take the FF s3 result and dl
+
