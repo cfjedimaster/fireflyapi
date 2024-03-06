@@ -8,10 +8,9 @@ CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 
 def getAccessToken(id, secret):
 	response = requests.post(f"https://ims-na1.adobelogin.com/ims/token/v3?client_id={id}&client_secret={secret}&grant_type=client_credentials&scope=openid,AdobeID,firefly_enterprise,firefly_api,ff_apis")
-	return response.json()
+	return response.json()["access_token"]
 
-token = getAccessToken(CLIENT_ID, CLIENT_SECRET)['access_token']
-
+token = getAccessToken(CLIENT_ID, CLIENT_SECRET)
 
 def textToImage(text, id, token):
 
