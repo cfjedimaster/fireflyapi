@@ -95,7 +95,7 @@ def dropbox_get_upload_link(path):
 
 
 def getFFAccessToken(id, secret):
-	response = requests.post(f"https://ims-na1.adobelogin.com/ims/token/v3?client_id={id}&client_secret={secret}&grant_type=client_credentials&scope=openid,AdobeID,firefly_enterprise,firefly_api")
+	response = requests.post(f"https://ims-na1.adobelogin.com/ims/token/v3?client_id={id}&client_secret={secret}&grant_type=client_credentials&scope=openid,AdobeID,firefly_enterprise,firefly_api,ff_apis")
 	return response.json()['access_token']
 
 def createPSD(psd, koProduct, sizes, sizeUrls, outputs, text, id, token):
@@ -152,7 +152,6 @@ def createPSD(psd, koProduct, sizes, sizeUrls, outputs, text, id, token):
 	
 		})
 
-	#print(json.dumps(data, indent=2))
 	response = requests.post(f"https://image.adobe.io/pie/psdService/documentOperations", headers = {"Authorization": f"Bearer {token}", "x-api-key": id }, json=data)
 	return response.json()
 
@@ -160,7 +159,7 @@ def uploadImage(path, id, token):
 	
 	with open(path,'rb') as file:
 
-		response = requests.post("https://firefly-beta.adobe.io/v2/storage/image", data=file, headers = {
+		response = requests.post("https://firefly-api.adobe.io/v2/storage/image", data=file, headers = {
 			"X-API-Key":id, 
 			"Authorization":f"Bearer {token}",
 			"Content-Type": "image/jpeg"
@@ -187,7 +186,7 @@ def textToImage(text, imageId, id, token):
 		}
 	}
 
-	response = requests.post("https://firefly-beta.adobe.io/v2/images/generate", json=data, headers = {
+	response = requests.post("https://firefly-api.adobe.io/v2/images/generate", json=data, headers = {
 		"X-API-Key":id, 
 		"Authorization":f"Bearer {token}",
 		"Content-Type":"application/json"
@@ -210,7 +209,7 @@ def generativeExpand(imageId, size, id, token):
 		}
 	}
 
-	response = requests.post("https://firefly-beta.adobe.io/v1/images/expand", json=data, headers = {
+	response = requests.post("https://firefly-api.adobe.io/v1/images/expand", json=data, headers = {
 		"X-API-Key":id, 
 		"Authorization":f"Bearer {token}",
 		"Content-Type":"application/json"
