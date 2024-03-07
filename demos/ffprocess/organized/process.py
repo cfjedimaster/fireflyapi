@@ -1,7 +1,5 @@
 import os
 import requests 
-import json 
-import sys 
 import dropbox
 from dropbox.files import CommitInfo, WriteMode
 import time 
@@ -60,8 +58,6 @@ def pollJob(job, id, token):
 		elif "status" in json_response["outputs"][0]:
 			status = json_response["outputs"][0]["status"]
 			
-		#print(json.dumps(json_response,indent=2))
-		#print(f"Current status: {status }")
 		if status != 'succeeded' and status != 'failed':
 			time.sleep(3)
 		else:
