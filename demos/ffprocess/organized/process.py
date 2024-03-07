@@ -9,8 +9,6 @@ from slugify import slugify
 
 ff_client_id = os.environ.get('CLIENT_ID')
 ff_client_secret = os.environ.get('CLIENT_SECRET')
-ps_client_id = os.environ.get('PS_CLIENT_ID')
-ps_client_secret = os.environ.get('PS_CLIENT_SECRET')
 db_refresh_token = os.environ.get('DROPBOX_REFRESH_TOKEN')
 db_app_key = os.environ.get('DROPBOX_APP_KEY')
 db_app_secret = os.environ.get('DROPBOX_APP_SECRET')
@@ -34,11 +32,6 @@ for l in langs:
 # Products sources from a set of images.
 products = os.listdir("input/products")
 
-def getPhotoshopAccessToken(id, secret):
-
-	response = requests.post(f"https://ims-na1.adobelogin.com/ims/token/v2?client_id={id}&client_secret={secret}&grant_type=client_credentials&scope=openid,AdobeID")
-	return response.json()["access_token"]
-
 def createRemoveBackgroundJob(input, output, id, token):
 	
 	data = {
@@ -61,6 +54,7 @@ def pollJob(job, id, token):
 
 		response = requests.get(jobUrl, headers = {"Authorization": f"Bearer {token}", "x-api-key": id })
 		json_response = response.json()
+
 		if "status" in json_response:
 			status = json_response["status"]
 		elif "status" in json_response["outputs"][0]:
@@ -218,11 +212,10 @@ def generativeExpand(imageId, size, id, token):
 	return response.json()["images"][0]["image"]["presignedUrl"]
 
 
-# Connect to Photoshop, Dropbox, and Firefly
-ps_access_token = getPhotoshopAccessToken(ps_client_id, ps_client_secret)
+# Connect to Firefly Services and Dropbox
 dbx = dropbox_connect(db_app_key, db_app_secret, db_refresh_token)
 ff_access_token = getFFAccessToken(ff_client_id, ff_client_secret)
-print("Connected to Photoshop, Firefly, and Dropbox APIs.")
+print("Connected to Firefly and Dropbox APIs.")
 
 referenceImage = uploadImage('input/source_image.jpg', ff_client_id, ff_access_token)
 print("Reference image uploaded.")
@@ -240,8 +233,8 @@ for product in products:
 	# Make a link to upload the result 
 	writableLink = dropbox_get_upload_link(f"{db_base_folder}knockout/{product}")
 
-	rbJob = createRemoveBackgroundJob(readableLink, writableLink, ps_client_id, ps_access_token)
-	result = pollJob(rbJob, ps_client_id, ps_access_token)
+	rbJob = createRemoveBackgroundJob(readableLink, writableLink, ff_client_id, ff_access_token)
+	result = pollJob(rbJob, ff_client_id, ff_access_token)
 
 	readableLink = dropbox_get_read_link(f"{db_base_folder}knockout/{product}")
 	rbProducts[product] = readableLink
@@ -280,8 +273,8 @@ for prompt in prompts:
 				width, height = size.split('x')
 				outputUrls.append(dropbox_get_upload_link(f"{db_base_folder}output/{lang['language']}-{slugify(prompt)}-{width}x{height}-{theTime}.jpg"))
 
-			result = createPSD(psdOnDropbox, rbProducts[product], sizes, sizeImages, outputUrls, lang["text"], ps_client_id, ps_access_token)
+			result = createPSD(psdOnDropbox, rbProducts[product], sizes, sizeImages, outputUrls, lang["text"], ff_client_id, ff_access_token)
 			print("The Photoshop API job is being run...")
-			finalResult=pollJob(result, ps_client_id, ps_access_token)
+			finalResult=pollJob(result, ff_client_id, ff_access_token)
 
 print("Done.")
