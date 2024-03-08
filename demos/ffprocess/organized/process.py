@@ -88,7 +88,7 @@ def getFFAccessToken(id, secret):
 	response = requests.post(f"https://ims-na1.adobelogin.com/ims/token/v3?client_id={id}&client_secret={secret}&grant_type=client_credentials&scope=openid,AdobeID,firefly_enterprise,firefly_api,ff_apis")
 	return response.json()['access_token']
 
-def createPSD(psd, koProduct, sizes, sizeUrls, outputs, text, id, token):
+def createOutput(psd, koProduct, sizes, sizeUrls, outputs, text, id, token):
 
 	data = {
 		"inputs": [{
@@ -240,22 +240,22 @@ for product in products:
 theTime = time.time()
 for prompt in prompts:
 	
-	# Step Five - For each prompt, generate a new background using prompt and reference
+	# For each prompt, generate a new background using prompt and reference
 	print(f"Generating an image with prompt: {prompt}.")
 	newImage = textToImage(prompt, referenceImage, ff_client_id, ff_access_token)
 
 	# I store a key from size to the image
 	sizeImages = {}
 
-	# I'm using this later when generating final results.
-	psdOnDropbox = dropbox_get_read_link(f"{db_base_folder}genfill-banner-template-text-comp.psd")
-
 	for size in sizes:
-		# Step Six - For each size, generate an expanded background
+		# For each size, generate an expanded background
 		print(f"Generating an expanded one at size {size}")
 		expandedBackground = generativeExpand(newImage, size, ff_client_id, ff_access_token)
 		sizeImages[size] = expandedBackground
 
+
+	# I'm using this later when generating final results.
+	psdOnDropbox = dropbox_get_read_link(f"{db_base_folder}genfill-banner-template-text-comp.psd")
 
 	for lang in languages:
 		
@@ -269,7 +269,7 @@ for prompt in prompts:
 				width, height = size.split('x')
 				outputUrls.append(dropbox_get_upload_link(f"{db_base_folder}output/{lang['language']}-{slugify(prompt)}-{width}x{height}-{theTime}.jpg"))
 
-			result = createPSD(psdOnDropbox, rbProducts[product], sizes, sizeImages, outputUrls, lang["text"], ff_client_id, ff_access_token)
+			result = createOutput(psdOnDropbox, rbProducts[product], sizes, sizeImages, outputUrls, lang["text"], ff_client_id, ff_access_token)
 			print("The Photoshop API job is being run...")
 			finalResult=pollJob(result, ff_client_id, ff_access_token)
 
