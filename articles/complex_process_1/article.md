@@ -19,10 +19,10 @@ If we start with just 3 products, but then add 2 prompts, 4 sizes, and 3 transla
 
 Before attempting to run this demo yourself, there are a few things you'll need.
 
-* You will need a set of credentials for the Firefly credentials. You can get those [here](LINK TBA)
-* As part of the workflow, we make use of cloud storage to hold files used by the Photoshop APIs. For this demo, we made use of Dropbox, so you will need credentials to work with their API including the app key, app secret, and refresh token.
+* You will need a set of credentials for Firefly Services. You can get those [here](LINK TBA)
+* As part of the workflow, we make use of cloud storage to hold files used by the Photoshop API. For this demo, we made use of Dropbox, so you will need credentials to work with their API including the app key, app secret, and refresh token.
 * The code that works with Dropbox does all of its work under one folder named `FFProcess`. This is conveniently set as a variable that can be modified. 
-* This demo makes use of a few demo assets that will be described as the process is documented. Everything related and required to this demo (minus credentials of course), can be grabbed from this [zip file](LINK TBA)
+* This demo makes use of a few demo assets that will be described as the process is documented. Everything  required to run this demo (minus credentials of course), can be grabbed from this [zip file](LINK TBA)
 * The code in this demo uses Python, but obviously any programming language can work with the REST APIs.
 
 ## The Workflow
@@ -30,7 +30,7 @@ Before attempting to run this demo yourself, there are a few things you'll need.
 Before digging into the code, let's break down the process step by step.
 
 1) Begin by reading in, or defining, our local data sets. This includes getting the list of product images, defining the desired sizes, reading in a text file of prompts (one prompt per line), reading in a text file of translations (one line each containing a language code and translation).
-1) Get an access token for Firefly services and connect to Dropbox using our credentials.
+1) Get an access token for Firefly Services and connect to Dropbox using our credentials.
 1) For each product image, generate a version with the background removed.
 1) For each prompt:
 	1) Generate an image based on the prompt.
@@ -129,7 +129,7 @@ def dropbox_connect(app_key, app_secret, refresh_token):
 
 This is pretty much straight from the documentation for the Dropbox Python SDK.
 
-For Firefly, the method looks like so:
+For Firefly Services, the method looks like so:
 
 ```python
 def getFFAccessToken(id, secret):
@@ -137,7 +137,7 @@ def getFFAccessToken(id, secret):
 	return response.json()['access_token']
 ```
 
-The client id and secret from our Firefly Services credentials are passed to the authentication endpoint and exchanged for an access token. The response includes other data, including the lifetime of the token, but for our needs we just need the token.
+The client id and secret from our Firefly Services credentials are passed to the authentication endpoint and exchanged for an access token. The response includes other data, including the lifetime of the token, but for our needs, we just need the token.
 
 ## Specifying a Reference Image
 
@@ -174,7 +174,7 @@ For our workflow, here's our source:
 
 ## Generating Product Images with a Removed Background
 
-Next up we need to take our source products and remove the background from each. Photoshop APIs require the use of cloud storage so this process will require three things:
+Next up we need to take our source products and remove the background from each. The Photoshop API requires the use of cloud storage so this process will require three things:
 
 * We need to upload our product to Dropbox
 * We need to create a 'readable' link for that resource, a way for the Photoshop API to read in the image.
@@ -304,7 +304,7 @@ def textToImage(text, imageId, id, token):
 	return response.json()["outputs"][0]["image"]["id"]
 ```
 
-This method is passed two main arguments (ignoring the credentials) - `text` and `imageId`, representing our prompt and reference image. You can see in `data` where these values are passed in. Finally, this is passed to the [Text-to-image](https://developer.adobe.com/firefly-api/api/#operation/v2/images/generate) API endpoint. The result, in this case only the ID of the image, is returned. We ignore the actual result URL as we just need the ID. You'll see why soon.
+This method is passed two main arguments (ignoring the credentials) - `text` and `imageId`, representing our prompt and reference image. You can see in `data` where these values are passed in. Finally, this is passed to the Firefly [Text-to-image](https://developer.adobe.com/firefly-api/api/#operation/v2/images/generate) API endpoint. The result, in this case only the ID of the image, is returned. We ignore the actual result URL as we just need the ID. You'll see why soon.
 
 After generating the image for the prompt, we then need to resize it once for each of our desired sizes:
 
@@ -368,7 +368,7 @@ The PSD was already uploaded to our Dropbox folder so all we need to do is gener
 psdOnDropbox = dropbox_get_read_link(f"{db_base_folder}genfill-banner-template-text-comp.psd")
 ```
 
-With that template in place, we can use a Photoshop API to dynamically replace the background, product, and text in each of the sized boxes. Here's that loop:
+With that template in place, we can use the Photoshop API to dynamically replace the background, product, and text in each of the sized boxes. Here's that loop:
 
 ```python
 	for lang in languages:
