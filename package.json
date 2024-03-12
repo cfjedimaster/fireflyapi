@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@sindresorhus/slugify": "^2.2.1",
-    "dotenv": "^16.4.1"
+    "dotenv": "^16.4.1",
+    "open": "^10.0.4"
   }
 }
