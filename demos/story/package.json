@@ -1,0 +1,19 @@
+{
+  "name": "story",
+  "version": "1.0.0",
+  "description": "",
+  "main": "process.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.2.1",
+    "@sindresorhus/slugify": "^2.2.1",
+    "mime": "^4.0.1",
+    "open": "^10.1.0"
+  }
+}
