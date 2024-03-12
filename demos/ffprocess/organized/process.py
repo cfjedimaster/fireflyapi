@@ -267,7 +267,7 @@ for prompt in prompts:
 
 			for size in sizes:
 				width, height = size.split('x')
-				outputUrls.append(dropbox_get_upload_link(f"{db_base_folder}output/{lang['language']}-{slugify(prompt)}-{width}x{height}-{theTime}.jpg"))
+				outputUrls.append(dropbox_get_upload_link(f"{db_base_folder}output/{lang['language']}-{slugify(prompt)}-{slugify(product)}-{width}x{height}-{theTime}.jpg"))
 
 			result = createOutput(psdOnDropbox, rbProducts[product], sizes, sizeImages, outputUrls, lang["text"], ff_client_id, ff_access_token)
 			print("The Photoshop API job is being run...")
