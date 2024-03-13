@@ -1,0 +1,16 @@
+{
+  "name": "makeheader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "makeheader.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "open": "^10.1.0",
+    "uuid": "^9.0.1"
+  }
+}
