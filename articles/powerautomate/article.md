@@ -1,4 +1,4 @@
-# Harnassing the Firefly Services APIs in PowerAutomate
+# Harnessing the Firefly Services APIs in PowerAutomate
 
 Microsoft's [Power Automate](https://make.powerautomate.com) is a powerful no-code solution that lets developers and non-developers alike create flexible workflows to automate processing using multiple different services. Firefly Services can be employed in the Power Automate platform and in this article, we'll walk you through the process of creating a sample workflow. Keep in mind that Power Automate is incredibly flexible and the example shown here is just one possible use of the platform.
 
