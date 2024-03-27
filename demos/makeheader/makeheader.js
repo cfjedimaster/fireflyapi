@@ -2,7 +2,7 @@
 process.loadEnvFile();
 import { styleText } from 'node:util';
 import { v4 as uuid4 } from 'uuid';
-import open, {apps} from 'open';
+import open from 'open';
 import fs from 'fs';
 
 const FF_CLIENT_ID = process.env.FF_CLIENT_ID;
@@ -15,7 +15,7 @@ async function getFFAccessToken(id, secret) {
 	params.append('grant_type', 'client_credentials');
 	params.append('client_id', id);
 	params.append('client_secret', secret);
-	params.append('scope', 'openid,AdobeID,firefly_enterprise,firefly_api,ff_apis');
+	params.append('scope', 'openid,AdobeID,session,additional_info,read_organizations,firefly_api,ff_apis');
 	
 	let resp = await fetch('https://ims-na1.adobelogin.com/ims/token/v3', 
 		{ 
