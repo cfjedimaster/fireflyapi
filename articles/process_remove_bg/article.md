@@ -1,6 +1,6 @@
 # Automating Imaging Workflows - Background Removal at Scale
 
-One of the more simpler APIs to use with the [Photoshop API](https://developer.adobe.com/firefly-services/docs/photoshop/) is the ability to remove a background. You provide a source, an output, and that's pretty much it. But where the real power comes in is setting this up to work at scale, where automation is used to handle this task automatically, saving your designers time in their day to day workload. In this article, we'll demonstrate an example of how such a workload could be built.
+One of the more simpler APIs to use with the [Photoshop API](https://developer.adobe.com/firefly-services/docs/photoshop/) is the ability to remove a background. You provide a source and an output, and that's pretty much it. But where the real power comes in is setting this up to work at scale, where automation is used to handle this task automatically, saving your designers time in their day-to-day workload. In this article, we'll demonstrate an example of how such a workload could be built.
 
 ## Prerequisites
 
@@ -178,8 +178,8 @@ After running our script, here's the output:
 
 Before sharing the full code below, some things to consider. 
 
-* This script is manually run, but could be set up to run on a schedule. Another option is to use the webhook notification features of your cloud storage provider to 'watch' a folder and fire off the process automatically on new files. Which you pick depends on how quickly you need the images processed and how many are coming in.
-* This script does *not* remove the input files, but most likely in production you would want to. If not, you would at least want to make note of what images have already been processed.
+* This script is manually run but could be set up to run on a schedule. Another option is to use the webhook notification features of your cloud storage provider to 'watch' a folder and fire off the process automatically on new files. Which you pick depends on how quickly you need the images processed and how many are coming in.
+* This script does *not* remove the input files, but most likely in production, you would want to. If not, you would at least want to make a note of what images have already been processed.
 
 ```python
 import os
