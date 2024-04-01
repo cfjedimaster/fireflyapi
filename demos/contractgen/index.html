@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+	<style>
+	body {
+		margin: 50px;
+	}
+
+	#sampleImages {
+		display: grid;
+		grid-template-columns: repeat(4, 20%);
+		gap: 16px;
+	}
+
+	#sampleImages img {
+		max-width: 200px;
+		max-height: 200px;
+		cursor: pointer;
+	}
+
+	#sampleImages img.selected {
+     border-style:solid;
+     border-width:thick;
+	 border-color:blue;
+	}
+
+	</style>
+</head>
+<body>
+
+<h2>Generate Contract Demo</h2>
+
+<p>
+<label for="name">Name for Contract</label>
+<input type="text" id="name" value="Chad Smith">
+</p>
+
+<p>
+<label for="address">Address for Contract</label>
+<input type="text" id="address" value="400 Pineville Road, Seattle, WA 90210">
+</p>
+
+<p>
+<label for="amount">Total Dollar Amount</label>
+<input type="number" id="number" value="500000">
+</p>
+
+
+<p>
+<label for="prompt">Contract Logo (AI Driven)</label>
+<input type="text" id="prompt" placeholder="Type in a prompt here to generate images." value="cat in the sky">
+<button id="generateImages">Generate Images</button>
+</p>
+<div id="sampleImages"></div>
+
+<p>
+<button id="submitBtn">Generate PDF</button>
+</p>
+
+<script src="https://documentservices.adobe.com/view-sdk/viewer.js"></script>
+<script>
+const ADOBE_KEY = '9861538238544ff39d37c6841344b78d';
+
+let $prompt, $generateImages, $sampleImages, $submitBtn;
+let $name, $address, $number;
+
+document.addEventListener('DOMContentLoaded', init, false);
+async function init() {
+
+	$prompt = document.querySelector('#prompt');
+	$generateImages = document.querySelector('#generateImages');
+	$generateImages.addEventListener('click', generateImages, false);
+	$sampleImages = document.querySelector('#sampleImages');
+	$submitBtn = document.querySelector('#submitBtn');
+	$submitBtn.addEventListener('click', submitForm, false);
+	$name = document.querySelector('#name');
+	$address = document.querySelector('#address');
+	$number = document.querySelector('#number');
+}
+
+async function generateImages() {
+	let prompt = $prompt.value.trim();
+	let origText = $generateImages.innerText;
+	if(!prompt) return;
+	console.log(`Create images for: ${prompt}`);
+
+	let imgs = document.querySelectorAll('#sampleImages img');
+	// clean up old handlers
+	imgs.forEach(i => {
+		i.removeEventListener(selectImage);
+	});
+
+	$sampleImages.innerHTML = '';
+
+	$generateImages.setAttribute('disabled', 'disabled');
+	$generateImages.innerText = 'Generating...';
+	let req = await fetch('/genImage', { method:'POST', body: JSON.stringify({prompt})});
+	let results = await req.json();
+	console.log(results);
+
+	let htmlResult = '';
+	results.forEach(p => {
+		htmlResult += `<div><img src="${p.image.presignedUrl}"></div>`;
+	});
+	$sampleImages.innerHTML = htmlResult;
+
+	$generateImages.removeAttribute('disabled');
+	$generateImages.innerText = origText;
+	
+	//set up click handler so we can note the user's choice
+	imgs = document.querySelectorAll('#sampleImages img');
+
+	imgs.forEach(i => {
+		i.addEventListener('click', selectImage);
+	});
+
+}
+
+function selectImage(e) {
+	let imgs = document.querySelectorAll('#sampleImages img');
+	imgs.forEach(i => {
+		if(i == e.target) {
+			if(i.classList.contains('selected')) i.classList.remove('selected');
+			else i.classList.add('selected');
+		} else i.classList.remove('selected');
+	});
+}
+
+async function submitForm(e) {
+	e.preventDefault();
+	console.log('Attempting to generate the PDF, here goes nothing');
+	let body = {
+		name: $name.value, 
+		address: $address.value,
+		number: parseInt($number.value,10)
+	}
+	console.log('body before ff', body);
+	let imgs = document.querySelectorAll('#sampleImages img');
+	imgs.forEach(i => {
+		if(i.classList.contains('selected')) {
+			body.image = i.src;
+		}
+	});
+	console.log('body after ff', body);
+
+	let req = await fetch('/genPDF', { method:'POST', body: JSON.stringify(body)});
+	let res = await req.text();
+
+	let adobeDCView = new AdobeDC.View({clientId: ADOBE_KEY});
+	adobeDCView.previewFile({
+		content:{ promise: base64ToArrayBuffer(res)},
+		metaData:{fileName: "contract.pdf"}
+	}, 
+	{
+		embedMode: "LIGHT_BOX"
+	});	
+}
+
+async function base64ToArrayBuffer(base64) {
+    var binary_string = window.atob(base64);
+    var len = binary_string.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
+</script>
+</body>
+</html>
