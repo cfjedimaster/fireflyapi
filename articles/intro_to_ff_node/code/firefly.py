@@ -39,5 +39,5 @@ def downloadFile(url, filePath):
 		output.write(bits)
 
 for output in result["outputs"]:
-	fileName = f'./{output["seed"]}.jpg';
-	downloadFile(output["image"]["presignedUrl"], fileName);
+	fileName = f'./{output["seed"]}.jpg'
+	downloadFile(output["image"]["presignedUrl"], fileName)
