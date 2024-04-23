@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title></title>
+	<title>Project Proposal</title>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
@@ -33,27 +33,68 @@
 </head>
 <body>
 
-<h2>Generate Contract Demo</h2>
+<h2>Generate Project Proposal Demo</h2>
 
 <p>
-<label for="name">Name for Contract</label>
-<input type="text" id="name" value="Chad Smith">
+<label for="author">Prepared by:</label>
+<input type="text" id="author" value="Chad Smith">
 </p>
 
 <p>
-<label for="address">Address for Contract</label>
-<input type="text" id="address" value="400 Pineville Road, Seattle, WA 90210">
+<label for="date">Date:</label>
+<input type="date" id="date">
 </p>
 
+<p>
+<label for="projectName">Project Name</label>
+<input type="text" id="projectName" value="Project X">
+</p>
+
+<p>
+<label for="clientName">Client Name</label>
+<input type="text" id="clientName" value="Client Zeta">
+</p>
+
+<p>
+<label for="clientCompany">Client Company</label>
+<input type="text" id="clientCompany" value="Company Gamma">
+</p>
+
+<p>
+<label for="contractorName">Contractor Name</label>
+<input type="text" id="contractorName" value="Jacob Camden">
+</p>
+
+<p>
+<label for="contractorCompany">Contractor Company</label>
+<input type="text" id="contractorCompany" value="Camden Tech, Inc.">
+</p>
+
+<p>
+<label for="contractorCompanyProfile">Contractor Company Profile</label>
+<textarea id="contractorCompanyProfile">
+Medical Insurance Provider
+</textarea>
+</p>
+
+<p>
+<label for="contractorCompanySkills">Contractor Company Skills</label>
+<textarea id="contractorCompanySkills">
+Deals in providing wide range of Healthcare Policies for all age segments
+</textarea>
+</p>
+
+
+<!--
 <p>
 <label for="amount">Total Dollar Amount</label>
 <input type="number" id="number" value="500000">
 </p>
-
+-->
 
 <p>
 <label for="prompt">Contract Logo (AI Driven)</label>
-<input type="text" id="prompt" placeholder="Type in a prompt here to generate images." value="cat in the sky">
+<input type="text" id="prompt" placeholder="Type in a prompt here to generate images." value="stack of papers on a desk">
 <button id="generateImages">Generate Images</button>
 </p>
 <div id="sampleImages"></div>
@@ -78,9 +119,18 @@ async function init() {
 	$sampleImages = document.querySelector('#sampleImages');
 	$submitBtn = document.querySelector('#submitBtn');
 	$submitBtn.addEventListener('click', submitForm, false);
-	$name = document.querySelector('#name');
-	$address = document.querySelector('#address');
-	$number = document.querySelector('#number');
+
+	$author = document.querySelector('#author');
+	$date = document.querySelector('#date');
+	$projectName = document.querySelector('#projectName');
+	$clientName = document.querySelector('#clientName');
+	$clientCompany = document.querySelector('#clientCompany');
+	$contractorName = document.querySelector('#contractorName');
+	$contractorCompany = document.querySelector('#contractorCompany');
+	$contractorCompanyProfile = document.querySelector('#contractorCompanyProfile');
+	$contractorCompanySkills = document.querySelector('#contractorCompanySkills');
+	
+	//$number = document.querySelector('#number');
 }
 
 async function generateImages() {
@@ -134,10 +184,21 @@ function selectImage(e) {
 async function submitForm(e) {
 	e.preventDefault();
 	console.log('Attempting to generate the PDF, here goes nothing');
+	
+	//rewrite the date a bit
+	let [year, month, day] = $date.value.split('-');
+	let dateStr = `${month}/${day}/${year}`;
 	let body = {
-		name: $name.value, 
-		address: $address.value,
-		number: parseInt($number.value,10)
+		author: $author.value, 
+		date: dateStr,
+		projectName: $projectName.value, 
+		clientName: $clientName.value, 
+		clientCompany: $clientCompany.value,
+		contractorName: $contractorName.value,
+		contractorCompany: $contractorCompany.value,
+		contractorCompanyProfile: $contractorCompanyProfile.value,
+		contractorCompanySkills: $contractorCompanySkills.value,
+//		number: parseInt($number.value,10)
 	}
 	console.log('body before ff', body);
 	let imgs = document.querySelectorAll('#sampleImages img');

@@ -15,7 +15,7 @@ const PDF_SERVICES_CLIENT_SECRET = process.env.PDF_SERVICES_CLIENT_SECRET;
 const REST_API = "https://pdf-services.adobe.io/";
 
 // Pointer to Word doc template
-const TEMPLATE = './template.docx';
+const TEMPLATE = './ProjectProposalLMTemplate.docx';
 
 // Firefly Area
 
@@ -44,6 +44,10 @@ async function textToImage(text, id, token) {
 	let body = {
 		"n":4,
 		"prompt":text,
+		"contentClass":"photo",
+		"styles":{
+			"presets":["bw"]
+		},
 		"size":{
 			"width":"1024",
 			"height":"1024"
