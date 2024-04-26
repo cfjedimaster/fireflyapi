@@ -324,8 +324,7 @@ let docTemplate = await upload('./story.docx', PDF_CLIENT_ID, pdf_token);
 console.log('Word doc template uploaded.');
 
 let job = await createDocumentGenerationJob(docTemplate, { paragraphs: parsedStory }, PDF_CLIENT_ID, pdf_token);
-let output = `./story-${slugify(new Date().getTime().toString())}.pdf`;
+let output = `./output/story-${slugify(new Date().getTime().toString())}.pdf`;
 await downloadWhenDone(job, output, PDF_CLIENT_ID, pdf_token);
 console.log(`Done and saved to ${output}`);
 await open(output);
-
