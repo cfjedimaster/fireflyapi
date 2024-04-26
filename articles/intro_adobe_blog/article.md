@@ -1,6 +1,6 @@
-# Introducing Adobe Firefly Service
-
-At [Adobe Summit](https://business.adobe.com/summit/adobe-summit.html) this year we announced the launch of [Firefly Services](https://www.adobe.com/creativecloud/business/enterprise/firefly.html). This suite of APIs encompasses the Photoshop and Lightroom APIs I've discussed before, as well as a whole new suite of APIs for Firefly itself. Best of all, the APIs are easy to use. I've been building demos and samples over the past few weeks, and while I'm obviously biased, they're truly a pleasure to use. Let's look at an example of how developers can integrate these APIs today.
+# Getting Started with Firefly Services
+'
+This year at Adobe Summit, we announced [Firefly Services](https://www.adobe.com/creativecloud/business/enterprise/firefly.html), a suite of APIs and services that encompass the capabilities of the [Adobe Firefly](https://firefly.adobe.com) website as well as the previously announced Photoshop and Lightroom APIs. These APIs all enable powerful creative workflows with a simple-to-use REST-based API. In this tutorial, we'll walk you through the process of creating your first implementation of the APIs. Let's get started!
 
 ## Basics
 
@@ -135,4 +135,4 @@ Here's one example from the prompt used above, and remember, there are numerous 
 
 ## Getting Started
 
-Most of the code above was taken from the *excellent* [intro guide](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/create-your-first-ff-application/) from the Firefly docs that includes both a Node and Python version. To learn more, check out the [developer homepage](https://developer.adobe.com/firefly-services/) for Firefly Services as well!
+Most of the code above was taken from the *excellent* [intro guide](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/create-your-first-ff-application/) from the Firefly docs that includes both a Node and Python version. To learn more, check out the [developer homepage](https://developer.adobe.com/firefly-services/) for Firefly Services as well. For organization that wish to work with the services, please reach out to your Adobe account representative. 
