@@ -29,3 +29,5 @@ ActionJSON:
 	}
 ]
 ```
+
+Demo Code: [./invertmask/demo.js](./invertmask/demo.js)
