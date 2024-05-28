@@ -17,7 +17,7 @@ async function getAccessToken(id, secret) {
 	params.append('grant_type', 'client_credentials');
 	params.append('client_id', id);
 	params.append('client_secret', secret);
-	params.append('scope', 'openid,AdobeID,firefly_enterprise,firefly_api');
+	params.append('scope', 'openid,AdobeID,firefly_enterprise,firefly_api,ff_apis');
 	
 	let resp = await fetch('https://ims-na1.adobelogin.com/ims/token/v3', 
 		{ 
@@ -41,7 +41,7 @@ async function uploadImage(filePath, id, token) {
 	// todo: make dynamic
 	let fileType = 'image/jpeg';
 
-	let upload = await fetch('https://firefly-beta.adobe.io/v2/storage/image', {
+	let upload = await fetch('https://firefly-api.adobe.io/v2/storage/image', {
 		method:'POST', 
 		headers: {
 			'Authorization':`Bearer ${token}`, 
@@ -79,7 +79,7 @@ async function textToImage(text, id, token, sourceImage, size="1024x1024", n=1, 
 
 	
 
-	let req = await fetch('https://firefly-beta.adobe.io/v2/images/generate', {
+	let req = await fetch('https://firefly-api.adobe.io/v2/images/generate', {
 		method:'POST',
 		headers: {
 			'X-Api-Key':id, 
