@@ -10,3 +10,5 @@ node_modules
 private/
 articles/**/code/output/*.jpg
 articles/**/output/*.jpg
+.npmrc
+setupenv.sh 
