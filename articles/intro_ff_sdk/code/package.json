@@ -1,7 +1,7 @@
 {
   "name": "code",
   "version": "1.0.0",
-  "type":"module",
+  "type": "module",
   "description": "",
   "main": "firefly.js",
   "scripts": {
@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@adobe/firefly-apis": "^1.0.0",
-    "@adobe/firefly-services-common-apis": "^1.0.0"
+    "@adobe/firefly-apis": "^2.0.1",
+    "@adobe/firefly-services-common-apis": "^2.0.1"
   }
 }

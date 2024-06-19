@@ -8,3 +8,5 @@ env
 .DS_Store
 node_modules
 articles/**/code/*.jpg
+private/
+articles/**/output/*.jpg
