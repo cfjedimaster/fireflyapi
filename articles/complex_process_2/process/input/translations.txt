@@ -1,0 +1,3 @@
+en,Awesome!
+fr,Fantastique!
+de,Geil!
