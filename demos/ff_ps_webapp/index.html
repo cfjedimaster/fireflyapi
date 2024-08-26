@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+	<style>
+	body {
+		margin: 20px;
+	}
+
+	div#fireflyResults span img {
+		max-width:250px;
+		margin-right: 10px;
+	}
+	</style>
+	<script src="//unpkg.com/alpinejs" defer></script>
+</head>
+<body>
+
+<div x-data="app">
+
+	<h2>Step One</h2>
+	<p>
+	<label for="prompt">To begin, enter a prompt:</label>
+	<input type="text" id="prompt" x-model="prompt"> 
+	<button @click="generateImages" :disabled="generatingImages">Generate Firefly Images</button>
+	</p>
+
+	<div id="fireflyResults" x-show="fireflyResults">
+		<template x-for="fireflyResult in fireflyResults">
+			<span>
+			<a :href="fireflyResult.image.url" target="_new"><img :src="fireflyResult.image.url" title="Click to open a full screen preview in a new window."></a>
+			</span>
+		</template>
+	</div>
+
+	<template x-if="step2Enabled">
+		<div>
+		<h2>Step Two</h2>
+		<p>
+		Enter text copy for the campaign, one per line.
+		</p>
+		<textarea></textarea>
+		<button>Generate Final Results</button>
+		</div>
+	</template>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
+
+<!--
+Notes for Ray:
+
+
+	prompt
+	nah, dont pickpick one of 4
+	enter text copy, up to 4
+	gen X sizes for a PSD template
+	gen X sizes output with each text copy
+
+-->
