@@ -1,6 +1,3 @@
-// Requires Node 21.7.0
-process.loadEnvFile();
-
 import slugify from '@sindresorhus/slugify';
 import open from 'open';
 
@@ -15,7 +12,7 @@ import { Readable } from 'stream';
 import { finished } from 'stream/promises';
 import mime from 'mime';
 
-const MODEL_NAME = "gemini-1.0-pro";
+const MODEL_NAME = "gemini-1.5-pro";
 const API_KEY = process.env.GEMINI_API;
 
 const FF_CLIENT_ID = process.env.FF_CLIENT_ID;
@@ -25,7 +22,30 @@ const PDF_CLIENT_ID = process.env.PDF_CLIENT_ID;
 const PDF_CLIENT_SECRET = process.env.PDF_CLIENT_SECRET;
 const PDF_REST_API = "https://pdf-services.adobe.io/";
 
-async function generateStory() {
+const schema = `
+{
+	"description":"A short story with summaries.",
+	"type":"array",
+	"items": {
+		"type":"object",
+		"properties": {
+			"text": {
+				"type":"string",
+				"description":"A paragraph of text for the story."
+			},
+			"summary": {
+				"type":"string",
+				"description":"A one-sentence summary of the story."
+			}
+		},
+		"required":["text","summary"]
+	},
+	"minItems":4,
+	"maxItems":4
+}
+`;
+
+async function generateStory(story) {
   const genAI = new GoogleGenerativeAI(API_KEY);
   const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
@@ -34,6 +54,8 @@ async function generateStory() {
     topK: 1,
     topP: 1,
     maxOutputTokens: 2048,
+	responseMimeType:'application/json',
+	responseSchema:JSON.parse(schema)
   };
 
   const safetySettings = [
@@ -56,7 +78,7 @@ async function generateStory() {
   ];
 
   const parts = [
-    {text: "Write a four paragraph story about a magical cat, appropriate for a young reader. At the end of each paragraph, write a one sentence summary of the previous paragraph, prefixed with the word: \"Summary:\" \n\n"},
+    {text: story},
   ];
 
   const result = await model.generateContent({
@@ -75,7 +97,7 @@ async function getFFAccessToken(id, secret) {
 	params.append('grant_type', 'client_credentials');
 	params.append('client_id', id);
 	params.append('client_secret', secret);
-	params.append('scope', 'openid,AdobeID,firefly_enterprise,firefly_api,ff_apis');
+	params.append('scope', 'firefly_api,ff_apis,openid,AdobeID,session,additional_info,read_organizations');
 	
 	let resp = await fetch('https://ims-na1.adobelogin.com/ims/token/v3', 
 		{ 
@@ -84,28 +106,7 @@ async function getFFAccessToken(id, secret) {
 		}
 	);
 
-	let data = await resp.json();
-	return data.access_token;
-}
-
-/*
-My goal is to take the raw string and split it into an array of objects, where each object is:
-.text = the text of the paragraph
-.summary = the summary
-
-Gemini _sometimes_ adds a line return before the summary, but isn't consistent, so we're going to rely on 
-Summary: being unique.
-*/
-function parseStory(s) {
-	let result = [];
-	let ps = s.split(/\n\n/);
-	ps.forEach(p => {
-
-		let [ text, summary ] = p.split(/Summary: /s);
-		result.push({ text, summary:summary.trim() });		
-	});
-
-	return result;
+	return (await resp.json()).access_token;
 }
 
 async function textToImage(text, id, token) {
@@ -279,7 +280,6 @@ async function pollJob(url, id, token) {
 }
 
 
-// Credit: https://stackoverflow.com/a/74722656/52160
 async function downloadFile(url, filePath) {
 	let res = await fetch(url);
 	const body = Readable.fromWeb(res.body);
@@ -297,19 +297,23 @@ async function downloadWhenDone(job, downloadPath, id, token) {
 	return;
 }
 
-let initialStory = await generateStory();
-console.log('Initial result done. Now parsing into paragraphs and summaries');
+if(process.argv.length < 3) {
+	console.log('Pass your story idea at the prompt: node process.js "Write a four paragraph story about a magical cat, appropriate for a young reader."');
+	process.exit(1);
+} 
 
-let parsedStory = parseStory(initialStory);
-console.log('Story has now been parsed.');
+let storyPrompt = process.argv[2];
+
+let story = JSON.parse(await generateStory(storyPrompt));
+console.log('Text and summaries of story generated.');
+
 
 let ff_token = await getFFAccessToken(FF_CLIENT_ID, FF_CLIENT_SECRET);
 console.log('Authenticated with Firefly');
 
-for(let p of parsedStory) {
+for(let p of story) {
 	console.log(`Generating a picture from ${p.summary}`);
 	let result = await textToImage(p.summary, FF_CLIENT_ID, ff_token);
-	console.log(JSON.stringify(result,null,'\t'));
 	let imgResult = result.outputs[0];
 
 	p.image = `<img src="${imgResult.image.presignedUrl}">`
@@ -323,7 +327,7 @@ console.log('Authenticated with PDF Services.');
 let docTemplate = await upload('./story.docx', PDF_CLIENT_ID, pdf_token);
 console.log('Word doc template uploaded.');
 
-let job = await createDocumentGenerationJob(docTemplate, { paragraphs: parsedStory }, PDF_CLIENT_ID, pdf_token);
+let job = await createDocumentGenerationJob(docTemplate, { paragraphs: story }, PDF_CLIENT_ID, pdf_token);
 let output = `./output/story-${slugify(new Date().getTime().toString())}.pdf`;
 await downloadWhenDone(job, output, PDF_CLIENT_ID, pdf_token);
 console.log(`Done and saved to ${output}`);
