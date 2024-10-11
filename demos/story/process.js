@@ -112,7 +112,7 @@ async function getFFAccessToken(id, secret) {
 async function textToImage(text, id, token) {
 
 	let body = {
-		"n":1,
+		"numVariations":1,
 		"prompt":text,
 		"contentClass":"art",
 		"size":{
@@ -121,7 +121,7 @@ async function textToImage(text, id, token) {
 		}
 	}
 
-	let req = await fetch('https://firefly-api.adobe.io/v2/images/generate', {
+	let req = await fetch('https://firefly-api.adobe.io/v3/images/generate', {
 		method:'POST',
 		headers: {
 			'X-Api-Key':id, 
@@ -316,7 +316,7 @@ for(let p of story) {
 	let result = await textToImage(p.summary, FF_CLIENT_ID, ff_token);
 	let imgResult = result.outputs[0];
 
-	p.image = `<img src="${imgResult.image.presignedUrl}">`
+	p.image = `<img src="${imgResult.image.url}">`
 
 	await delay(5 * 1000);
 }
